@@ -14,17 +14,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('posts', PostController::class)
-        ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
+        ->only(['store', 'update', 'destroy'])
         ->names([
-            'index' => 'post.list',
-            'create' => 'post.create',
             'store' => 'post.store',
-            'show' => 'post.view',
-            'edit' => 'post.edit',
             'update' => 'post.update',
             'destroy' => 'post.delete',
         ]);
 });
+
+Route::resource('posts', PostController::class)
+    ->only(['index', 'create', 'edit', 'show'])
+    ->names([
+        'index' => 'post.list',
+        'create' => 'post.create',
+        'edit' => 'post.edit',
+        'show' => 'post.view',
+    ]);
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

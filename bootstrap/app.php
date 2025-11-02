@@ -24,6 +24,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+
+        // Not Found Exception
+        $exceptions->renderable(function (Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+            if ($request->is('posts/*')) {
+                return response()->json([
+                    'message' => 'Post not found.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+        });
+
         // Access Denied Exception
         $exceptions->renderable(function (Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, $request) {
             if ($request->wantsJson()) {

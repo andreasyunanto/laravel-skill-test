@@ -76,16 +76,9 @@ class PostController extends Controller
      * PATCH /posts/{post}
      * Only author can update
      */
-    public function update(UpdatePostRequest $request, $id)
+    public function update(UpdatePostRequest $request, Post $post)
     {
         if ($request->wantsJson()) {
-
-            $post = Post::find($id);
-            if (! $post) {
-                return response()->json([
-                    'message' => 'Post not found.',
-                ], Response::HTTP_NOT_FOUND);
-            }
 
             $this->authorize('update', $post);
 
@@ -106,15 +99,13 @@ class PostController extends Controller
      * GET /posts/{post}
      * Return 404 if draft or scheduled.
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        $post = Post::with(['user'])->find($id);
-
-        if (! $post || $post->isDraft() || $post->isScheduled()) {
-            return response()->json([
-                'message' => 'Post not found.',
-            ], Response::HTTP_NOT_FOUND);
+        if ($post->isDraft() || $post->isScheduled()) {
+            return response()->json(['message' => 'Post not found.'], Response::HTTP_NOT_FOUND);
         }
+
+        $post->load('user');
 
         return response()->json($post);
     }
@@ -123,17 +114,9 @@ class PostController extends Controller
      * DELETE /posts/{post}
      * Only author can delete
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Post $post)
     {
         if ($request->wantsJson()) {
-
-            $post = Post::find($id);
-
-            if (! $post) {
-                return response()->json([
-                    'message' => 'Post not found',
-                ], Response::HTTP_NOT_FOUND);
-            }
 
             $this->authorize('delete', $post);
             $post->delete();
